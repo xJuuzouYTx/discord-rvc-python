@@ -6,7 +6,6 @@ from discord.ext.commands import Bot
 from inference import Inference
 from utils import Audio
 import uuid
-from enum import Enum
 import typing
 from discord import app_commands
 
@@ -15,8 +14,12 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 
 bot = Bot(command_prefix=".", intents=discord.Intents.default())
 
-models = {}
+def delete_files(paths):
+    for path in paths:
+        if os.path.exists(path):
+            os.remove(path)
 
+models = {}
 for root, _, files in os.walk("./weights"):
     pth = None
     index = None
@@ -31,9 +34,8 @@ for root, _, files in os.walk("./weights"):
         folder_name = os.path.basename(root)
         models[folder_name] = {
             'pth': os.path.join(folder_name, pth),
-            'index': os.path.join(folder_name, index) if index else "",
+            'index': os.path.join("./weights/", folder_name, index) if index else "",
         }
-
 
 @bot.event
 async def on_ready():
@@ -97,7 +99,7 @@ async def infer(interaction: discord.Interaction, audiofile: discord.Attachment,
     uuid_filename = uuid.uuid4()
     file_extension = audiofile.filename.split('.')[-1]
     audio_path = Audio.dowload_from_url(
-        url=audiofile.url, output=f"./audios/{uuid_filename}.{file_extension}")
+        url=audiofile.proxy_url, output=f"./audios/{uuid_filename}.{file_extension}")
     inference.source_audio_path = audio_path
 
     output = await bot.loop.run_in_executor(None, inference.run)
@@ -110,5 +112,7 @@ async def infer(interaction: discord.Interaction, audiofile: discord.Attachment,
             content=f"Hey {interaction.user.mention}, ¡tu audio está listo!", 
             file=attachment
         )
+    
+    delete_files([audio_path, output['file']])
         
 bot.run(TOKEN)

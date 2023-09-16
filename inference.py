@@ -187,8 +187,7 @@ class Inference:
 
     def run(self):
         print("RVC: Empezando la inferencia...")
-        infer_web.get_vc(
-            self._model_name, self.protection_amnt, self.protect1)
+        infer_web.get_vc(self._model_name)
         
         conversion_data = infer_web.vc_single(
             self.speaker_id,

@@ -58,7 +58,7 @@ hydra-core==1.0.7
 idna==3.4
 importlib-metadata==6.0.0
 importlib-resources==6.0.0
-ipython==8.15.0
+ipython
 jedi==0.18.2
 Jinja2==3.1.2
 joblib==1.2.0
@@ -117,7 +117,6 @@ python-dateutil==2.8.2
 python-dotenv==1.0.0
 python-multipart==0.0.5
 pytz==2022.6
-pywin32==306
 pyworld==0.3.2
 PyYAML==6.0
 regex==2022.10.31
@@ -149,11 +148,10 @@ tensorboard-plugin-wit==1.8.1
 tensorboardX==2.6.1
 threadpoolctl==3.1.0
 toolz==0.12.0
-torch==2.2.0.dev20230915+cu121
-torchaudio==2.2.0.dev20230915+cu121
+torch==2.0.0
+torchaudio==2.0.1
 torchcrepe==0.0.19
 torchgen==0.0.1
-torchvision==0.17.0.dev20230915+cu121
 tornado==6.3.2
 tqdm==4.64.1
 traitlets==5.9.0
