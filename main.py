@@ -60,15 +60,13 @@ class AudioQueue:
         print("****************")
         infer_message = InferMessage(interaction, audiofile, voice, method)
         self.queue.append(infer_message)
-        print(interaction.user.id)
         users = users_ref.where(
             "discord_id", "==", str(interaction.user.id)).get()
-        print(interaction.user.name)
-        print(users)
+        
         if len(users) == 0:
             embed = discord.Embed(
                 title=f"¡Lo sentimos!",
-                description=f"No tienes una suscripción activa, por favor visita https://mangio.io para obtener una suscripción",
+                description=f"No tienes una suscripción activa, por favor visita https://rvcplayer.ai para obtener una suscripción",
                 color=discord.Color.brand_red()
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -92,7 +90,6 @@ class AudioQueue:
         self.processing = True
 
         for current in self.queue:
-            print(current)
             uuid_filename = uuid.uuid4()
             file_extension = current.audiofile.filename.split('.')[-1]
             audio_path = Audio.dowload_from_url(
