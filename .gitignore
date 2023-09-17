@@ -49,3 +49,4 @@ configs/48k.json
 configs/40k.json
 configs/32k.json
 .env
+firebase_secrets.json
