@@ -120,7 +120,7 @@ class AudioQueue:
                     description="Ocurrió un error al convertir tu archivo",
                     color=discord.Color.brand_red()
                 )
-                await current.interaction.response.send_message(embed=embed, ephemeral=True)
+                await current.interaction.followup.send(embed=embed, ephemeral=True)
 
             delete_files([audio_path, output['file']])
             self.queue.remove(current)

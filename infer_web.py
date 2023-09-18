@@ -18,6 +18,7 @@ import warnings
 now_dir = os.getcwd()
 sys.path.append(now_dir)
 os.makedirs(os.path.join(now_dir, "audios"), exist_ok=True)
+os.makedirs(os.path.join(now_dir, "audio-outputs"), exist_ok=True)
 os.makedirs(os.path.join(now_dir, "weights"), exist_ok=True)
 warnings.filterwarnings("ignore")
 torch.manual_seed(114514)
