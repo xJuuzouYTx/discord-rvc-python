@@ -1,6 +1,6 @@
 from vc_infer_pipeline import VC
 from utils import Audio
-from lib.infer_pack.models import (
+from infer_pack.models import (
     SynthesizerTrnMs256NSFsid,
     SynthesizerTrnMs256NSFsid_nono,
     SynthesizerTrnMs768NSFsid,
