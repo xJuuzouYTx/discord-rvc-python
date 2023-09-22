@@ -5,13 +5,14 @@ import tarfile
 import subprocess
 from pathlib import Path
 
+
 def install_packages_but_jank_af():
     packages = ['build-essential', 'python3-dev', 'ffmpeg', 'aria2']
     pip_packages = ['pip', 'setuptools', 'wheel', 'httpx==0.23.0', 'faiss-gpu', 'fairseq', 'gradio==3.34.0',
                     'ffmpeg', 'ffmpeg-python', 'praat-parselmouth', 'pyworld', 'numpy==1.23.5',
                     'numba==0.56.4', 'librosa==0.9.2', 'mega.py', 'gdown', 'onnxruntime', 'pyngrok==4.1.12',
-                    'gTTS', 'elevenlabs', 'wget', 'tensorboardX', 'unidecode', 'huggingface-hub', 'stftpitchshift==1.5.1', 
-                    'yt-dlp', 'pedalboard', 'pathvalidate', 'nltk', 'edge-tts', 'git+https://github.com/suno-ai/bark.git', 'python-dotenv' , 'av']
+                    'gTTS', 'elevenlabs', 'wget', 'tensorboardX', 'unidecode', 'huggingface-hub', 'stftpitchshift==1.5.1',
+                    'yt-dlp', 'pedalboard', 'pathvalidate', 'nltk', 'edge-tts', 'git+https://github.com/suno-ai/bark.git', 'python-dotenv', 'av']
 
     print("Updating and installing system packages...")
     for package in packages:
@@ -40,9 +41,9 @@ def setup_environment(ForceUpdateDependencies, ForceTemporaryStorage):
         pip_packages = ['pip', 'setuptools', 'wheel', 'httpx==0.23.0', 'faiss-gpu', 'fairseq', 'gradio==3.34.0',
                         'ffmpeg', 'ffmpeg-python', 'praat-parselmouth', 'pyworld', 'numpy==1.23.5',
                         'numba==0.56.4', 'librosa==0.9.2', 'mega.py', 'gdown', 'onnxruntime', 'pyngrok==4.1.12',
-                        'gTTS', 'elevenlabs', 'wget', 'tensorboardX', 'unidecode', 'huggingface-hub', 'stftpitchshift==1.5.1', 
-                        'yt-dlp', 'pedalboard', 'pathvalidate', 'nltk', 'edge-tts', 'git+https://github.com/suno-ai/bark.git', 'python-dotenv' , 'av', 
-                        'torchcrepe==0.0.19']
+                        'gTTS', 'elevenlabs', 'wget', 'tensorboardX', 'unidecode', 'huggingface-hub', 'stftpitchshift==1.5.1',
+                        'yt-dlp', 'pedalboard', 'pathvalidate', 'nltk', 'edge-tts', 'git+https://github.com/suno-ai/bark.git', 'python-dotenv', 'av',
+                        'torchcrepe==0.0.19', 'urllib3']
 
         print("Updating and installing system packages...")
         for package in packages:
@@ -51,7 +52,6 @@ def setup_environment(ForceUpdateDependencies, ForceTemporaryStorage):
 
         print("Updating and installing pip packages...")
         subprocess.check_call(['pip', 'install', '--upgrade'] + pip_packages)
-
 
         print('Packages up to date.')
 
@@ -66,7 +66,8 @@ def setup_environment(ForceUpdateDependencies, ForceTemporaryStorage):
                         mtime = os.path.getmtime(fname)
                         writer.writerow([fname, mtime])
                     except Exception as e:
-                        print(f'Skipping irrelevant nonexistent file {fname}: {str(e)}')
+                        print(
+                            f'Skipping irrelevant nonexistent file {fname}: {str(e)}')
         print(f'Finished recording filesystem timestamps to {output_file}.')
 
     # Function to compare files
@@ -76,17 +77,18 @@ def setup_environment(ForceUpdateDependencies, ForceTemporaryStorage):
 
         with open(old_file, 'r') as f:
             reader = csv.reader(f)
-            old_files = {rows[0]:rows[1] for rows in reader}
+            old_files = {rows[0]: rows[1] for rows in reader}
 
         with open(new_file, 'r') as f:
             reader = csv.reader(f)
-            new_files = {rows[0]:rows[1] for rows in reader}
+            new_files = {rows[0]: rows[1] for rows in reader}
 
         removed_files = old_files.keys() - new_files.keys()
         added_files = new_files.keys() - old_files.keys()
         unchanged_files = old_files.keys() & new_files.keys()
 
-        changed_files = {f for f in unchanged_files if old_files[f] != new_files[f]}
+        changed_files = {
+            f for f in unchanged_files if old_files[f] != new_files[f]}
 
         for file in removed_files:
             print(f'File has been removed: {file}')
@@ -126,7 +128,8 @@ def setup_environment(ForceUpdateDependencies, ForceTemporaryStorage):
         if ForceTemporaryStorage:
             print('Finished downloading CachedRVC.tar.gz.')
         else:
-            print('CachedRVC.tar.gz found on Google Drive. Proceeding to copy and extract...')
+            print(
+                'CachedRVC.tar.gz found on Google Drive. Proceeding to copy and extract...')
 
         # Check if ForceTemporaryStorage is True and skip copying if it is
         if ForceTemporaryStorage:
@@ -142,9 +145,11 @@ def setup_environment(ForceUpdateDependencies, ForceTemporaryStorage):
                 try:
                     tar.extract(member, extract_path)
                 except Exception as e:
-                    print('Failed to extract a file (this isn\'t normal)... forcing an update to compensate')
+                    print(
+                        'Failed to extract a file (this isn\'t normal)... forcing an update to compensate')
                     ForceUpdateDependencies = True
-            print(f'Extraction of {content_file_path} to {extract_path} completed.')
+            print(
+                f'Extraction of {content_file_path} to {extract_path} completed.')
 
         if ForceUpdateDependencies:
             install_packages()
@@ -156,7 +161,8 @@ def setup_environment(ForceUpdateDependencies, ForceTemporaryStorage):
         install_packages()
 
         scan_and_write('/usr/', '/content/usr_files_new.csv')
-        changed_files = compare_files('/content/usr_files.csv', '/content/usr_files_new.csv')
+        changed_files = compare_files(
+            '/content/usr_files.csv', '/content/usr_files_new.csv')
 
         with tarfile.open('/content/CachedRVC.tar.gz', 'w:gz') as new_tar:
             for file in changed_files:
@@ -164,6 +170,7 @@ def setup_environment(ForceUpdateDependencies, ForceTemporaryStorage):
                 print(f'Added to tar: {file}')
 
         os.makedirs('/content/drive/MyDrive/RVC_Cached', exist_ok=True)
-        shutil.copy('/content/CachedRVC.tar.gz', '/content/drive/MyDrive/RVC_Cached/CachedRVC.tar.gz')
+        shutil.copy('/content/CachedRVC.tar.gz',
+                    '/content/drive/MyDrive/RVC_Cached/CachedRVC.tar.gz')
         print('Updated CachedRVC.tar.gz copied to Google Drive.')
         print('Dependencies fully up to date; future runs should be faster.')
