@@ -3,7 +3,7 @@ import discord
 from dotenv import load_dotenv
 from discord.ext.commands import Bot
 from inference import Inference
-from utils import Audio
+from myutils import Audio
 import uuid
 import typing
 from discord import app_commands
