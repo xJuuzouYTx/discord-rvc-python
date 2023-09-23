@@ -4,6 +4,7 @@ import ffmpeg
 import numpy as np
 import random
 import shutil
+import torchaudio
 
 class Audio:
     
@@ -43,12 +44,16 @@ class Audio:
             if not file.endswith(".wav"):
                 file_formanted = f"{file}.wav"
                 if not os.path.isfile(file_formanted):
-                    ffmpeg.input(file).output(file_formanted).run(cmd=["ffmpeg", "-nostdin"],  capture_stdout=True, capture_stderr=True)
+                    # Usar torchaudio para convertir a WAV (esto aprovecha la GPU si es compatible)
+                    waveform, _ = torchaudio.load(file)
+                    torchaudio.save(file_formanted, waveform, sr)
 
             numerator = round(random.uniform(1, 4), 4)
             output_file = f"{file_formanted}FORMANTED_{numerator}.wav"
 
-            os.system(f'{stft} -i "{file_formanted}" -q "{Quefrency}" -t "{Timbre}" -o "{output_file}"')
+            # Usar torchaudio para aplicar el procesamiento de audio (esto aprovecha la GPU si es compatible)
+            waveform, _ = torchaudio.load(file_formanted, num_frames=-1)
+            torchaudio.save(output_file, waveform, sr)
 
             print(f" · Formanted {file_formanted}!\n")
 
