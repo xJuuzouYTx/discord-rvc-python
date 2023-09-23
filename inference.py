@@ -2,6 +2,9 @@ import infer_web
 import wget
 import os
 import scipy.io.wavfile as wavfile
+from utils import model
+import validators
+from myutils import delete_files
 
 class Inference:
     
@@ -9,7 +12,7 @@ class Inference:
     
     def __init__(
         self,
-        model_name,
+        model_name=None,
         source_audio_path=None,
         output_file_name=None,
         feature_index_path="",
@@ -186,8 +189,15 @@ class Inference:
         self._protect1 = protect1
 
     def run(self):
+        current_dir = os.getcwd()
+        modelname = model.model_downloader(self._model_name, "./zips/", "./weights/")
+        
+        model_info = model.get_model(os.path.join(current_dir, 'weights') , modelname)
+        index = model_info.get('index', '')
+        pth = model_info.get('pth', None)
+        
         print("RVC: Empezando la inferencia...")
-        infer_web.get_vc(self._model_name)
+        infer_web.get_vc(pth)
         
         conversion_data = infer_web.vc_single(
             self.speaker_id,
@@ -196,8 +206,8 @@ class Inference:
             self.transposition,
             self.f0_file,
             self.f0_method,
-            self.feature_index_path,
-            self.feature_index_path,
+            index,
+            index,
             self.feature_ratio,
             self.harvest_median_filter,
             self.resample,
@@ -205,6 +215,8 @@ class Inference:
             self.protection_amnt,
             self.crepe_hop_length,
         )
+        
+        delete_files([os.path.join(current_dir, 'weights') , modelname])
         
         if "Success." in conversion_data[0]:
             wavfile.write(

@@ -1,23 +1,10 @@
 import os
 import shutil
 from mega import Mega
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
-from google.colab import auth
-from oauth2client.client import GoogleCredentials
 import gdown
 import re
 import wget
 import sys
-
-auth.authenticate_user()
-gauth = GoogleAuth()
-gauth.credentials = GoogleCredentials.get_application_default()
-gdrive = GoogleDrive(gauth)
-
-url_modelo = "https://drive.google.com/file/d/12ltzXpNSpHmJtyH1VU1XzmvzvktgikKU/view"
-
-# define Python user-defined exceptions
 
 
 class InvalidDriveId(Exception):
@@ -27,47 +14,18 @@ class InvalidDriveId(Exception):
 
 
 def model_downloader(url, zip_path, dest_path):
+    """Download and unzip a file from Google Drive or Mega."""
+    
     def drive_download(url, dest_folder):
-        # Descargar el archivo de Google Drive usando gdown
+        print(f"Descargando desde drive...")
         try:
-            print(f"Descargando desde drive...")
-
-            # Obtener id del archivo y descargar
-            id_archivo = url.split('/')[-1]
-            match = re.match(
-                r"https://drive\.google\.com/.*[?&]id=([^/&]+)", url)
-            if match:
-                id = match.group(1)
-            else:
-                match = re.match(
-                    r"https://drive\.google\.com/file/d/([^/&]+)", url)
-                if match:
-                    id = match.group(1)
-                else:
-                    id = None
-            id_archivo = id
-
-            if not id_archivo:
-                raise InvalidDriveId(
-                    "No se encontró el ID del archivo, compruebe la url y vuelva a intentarlo.")
-
-            downloaded = gdrive.CreateFile({'id': id_archivo})
-            dest_path = os.path.join(dest_folder, downloaded['title'])
-            downloaded.GetContentFile(dest_path)
-            return downloaded['title']
-
-        except InvalidDriveId as idErr:
+            filename = gdown.download(url, fuzzy=True)
+            shutil.move(os.path.join(os.getcwd(), filename),
+                        os.path.join(dest_folder, filename))
+            return filename
+        except:
+            print("El intento de descargar con drive no funcionó")
             return None
-        except Exception as e:
-            print("Ocurrio un error en drive, reintentando")
-            try:
-                filename = gdown.download(url, fuzzy=True)
-                shutil.move(os.path.join(os.getcwd(), filename),
-                            os.path.join(dest_folder, filename))
-                return filename
-            except:
-                print("El intento de descargar con drive no funcionó")
-                return None
 
     def mega_download(url, dest_folder):
         try:
@@ -122,31 +80,38 @@ def model_downloader(url, zip_path, dest_path):
     if filename:
         print(f"Descomprimiendo {filename}...")
         modelname = str(filename).replace(".zip", "")
-        shutil.unpack_archive(os.path.join(
-            zip_path, filename), os.path.join(dest_path, modelname))
+        zip_file_path = os.path.join(zip_path, filename)
+            
+        shutil.unpack_archive(zip_file_path, os.path.join(dest_path, modelname))
+        
+        if os.path.exists(zip_file_path):
+            os.remove(zip_file_path)
 
         return modelname
     else:
         return None
 
+
 def get_models(weight_path):
-      # Obtener todos los elementos en la ruta
-  files = os.listdir(weight_path)
-  # Filtrar solo los directorios
-  return  [file for file in files if os.path.isdir(os.path.join(weight_path, file))]
+    # Obtener todos los elementos en la ruta
+    files = os.listdir(weight_path)
+    # Filtrar solo los directorios
+    return [file for file in files if os.path.isdir(os.path.join(weight_path, file))]
+
 
 def get_model(weight_path, modelname):
-  resources = {}
-  for root, dirs, files in os.walk(os.path.join(weight_path, modelname)):
+    resources = {}
+    for root, dirs, files in os.walk(os.path.join(weight_path, modelname)):
         for file in files:
             if file.endswith('.index'):
-              resources['index'] = os.path.join(root, file)
+                resources['index'] =  os.path.relpath(os.path.join(root, file), start=weight_path)
             if file.endswith('.pth'):
-              resources['pth'] = os.path.join(root, file)
-  return resources
+                resources['pth'] =  os.path.relpath(os.path.join(root, file), start=weight_path)
+    return resources
+
 
 def get_audios(audios_path):
-  # Obtener todos los elementos en la ruta
-  files = os.listdir(audios_path)
-  # Filtrar solo los directorios
-  return  [file for file in files if not os.path.isdir(os.path.join(audios_path, file)) and os.path.join(audios_path, file).endswith(('.mp3', '.wav'))]
+    # Obtener todos los elementos en la ruta
+    files = os.listdir(audios_path)
+    # Filtrar solo los directorios
+    return [file for file in files if not os.path.isdir(os.path.join(audios_path, file)) and os.path.join(audios_path, file).endswith(('.mp3', '.wav'))]

@@ -3,6 +3,7 @@ import os
 import ffmpeg
 import numpy as np
 import random
+import shutil
 
 class Audio:
     
@@ -35,104 +36,33 @@ class Audio:
         return f'Audio: {self._name} {self._url}'
     
     @classmethod
-    def load_audio(self, file, sr, do_formant, Quefrency, Timbre, stft="stftpitchshift.exe"):
-        """
-        Carga y procesa un archivo de audio.
-
-        Args:
-            file (str): El nombre del archivo de audio.
-            sr (int): Tasa de muestreo deseada.
-            do_formant (bool): Indica si se debe aplicar el procesamiento de formantes.
-            Quefrency (float): Valor de quefrencia para el procesamiento de formantes.
-            Timbre (float): Valor de timbre para el procesamiento de formantes.
-            stft (stft): Especifica la herramienta de procesamiento de audio.
-
-        Returns:
-            np.ndarray: Un array NumPy con los datos de audio procesados.
-        """
-        
-        converted = False
+    def load_audio(cls, file, sr, do_formant, Quefrency, Timbre, stft="stftpitchshift.exe"):
         try:
-            # Eliminar espacios y comillas del nombre del archivo
-            file = (file.strip(" ").strip('"').strip("\n").strip('"').strip(" ")) 
-            file_formanted = file.strip(" ").strip('"').strip("\n").strip('"').strip(" ")
-            
-            if (do_formant):
-                numerator = round(random.uniform(1, 4), 4)
+            file = file.strip(' "\n')  # Eliminar espacios y comillas del nombre del archivo
 
-                if not file.endswith(".wav"):
-                    if not os.path.isfile(f"{file_formanted}.wav"):
-                        converted = True
-                        
-                        converting = (
-                            ffmpeg.input(file_formanted, threads=0)
-                            .output(f"{file_formanted}.wav")
-                            .run(
-                                cmd=["ffmpeg", "-nostdin"],
-                                capture_stdout=True,
-                                capture_stderr=True,
-                            )
-                        )
-                    else:
-                        pass
+            if not file.endswith(".wav"):
+                file_formanted = f"{file}.wav"
+                if not os.path.isfile(file_formanted):
+                    ffmpeg.input(file).output(file_formanted).run(cmd=["ffmpeg", "-nostdin"],  capture_stdout=True, capture_stderr=True)
 
-                file_formanted = (
-                    f"{file_formanted}.wav"
-                    if not file_formanted.endswith(".wav")
-                    else file_formanted
-                )
+            numerator = round(random.uniform(1, 4), 4)
+            output_file = f"{file_formanted}FORMANTED_{numerator}.wav"
 
-                # Aplicar procesamiento de formantes
-                os.system(
-                    '%s -i "%s" -q "%s" -t "%s" -o "%sFORMANTED_%s.wav"'
-                    % (
-                        stft,
-                        file_formanted,
-                        Quefrency,
-                        Timbre,
-                        file_formanted,
-                        str(numerator),
-                    )
-                )
+            os.system(f'{stft} -i "{file_formanted}" -q "{Quefrency}" -t "{Timbre}" -o "{output_file}"')
 
-                print(f" · Formanted {file_formanted}!\n")
+            print(f" · Formanted {file_formanted}!\n")
 
-                out, _ = (
-                    ffmpeg.input(
-                        "%sFORMANTED_%s.wav" % (file_formanted, str(numerator)), threads=0
-                    )
-                    .output("-", format="f32le", acodec="pcm_f32le", ac=1, ar=sr)
-                    .run(
-                        cmd=["ffmpeg", "-nostdin"], capture_stdout=True, capture_stderr=True
-                    )
-                )
+            out, _ = ffmpeg.input(output_file).output(
+                "-", format="f32le", acodec="pcm_f32le", ac=1, ar=sr
+            ).run(cmd=["ffmpeg", "-nostdin"], capture_stdout=True, capture_stderr=True)
 
-                try:
-                    os.remove("%sFORMANTED_%s.wav" % (file_formanted, str(numerator)))
-                except Exception:
-                    pass
-                    print("couldn't remove formanted type of file")
+            os.remove(output_file)
 
-            else:
-                out, _ = (
-                    ffmpeg.input(file, threads=0)
-                    .output("-", format="f32le", acodec="pcm_f32le", ac=1, ar=sr)
-                    .run(
-                        cmd=["ffmpeg", "-nostdin"], capture_stdout=True, capture_stderr=True
-                    )
-                )
         except Exception as e:
             raise RuntimeError(f"Failed to load audio: {e}")
 
-        if converted:
-            try:
-                os.remove(file_formanted)
-            except Exception:
-                pass
-                print("couldn't remove converted type of file")
-            converted = False
-
         return np.frombuffer(out, np.float32).flatten()
+    
     
     @classmethod
     def dowload_from_url(self, url = None, output = "./audios/file.wav"):
@@ -148,3 +78,11 @@ class Audio:
         
         return output
     
+
+def delete_files(paths):
+    for path in paths:
+        if os.path.exists(path):
+            if os.path.isdir(path):
+                shutil.rmtree(path, ignore_errors=True)
+            if os.path.isfile(path):
+                os.remove(path)
