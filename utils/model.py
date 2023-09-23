@@ -5,6 +5,7 @@ import gdown
 import re
 import wget
 import sys
+import uuid
 
 
 class InvalidDriveId(Exception):
@@ -19,9 +20,7 @@ def model_downloader(url, zip_path, dest_path):
     def drive_download(url, dest_folder):
         print(f"Descargando desde drive...")
         try:
-            filename = gdown.download(url, fuzzy=True)
-            shutil.move(os.path.join(os.getcwd(), filename),
-                        os.path.join(dest_folder, filename))
+            filename = gdown.download(url, os.path.join(dest_folder, f"{uuid.uuid4()}.zip"), fuzzy=True)
             return filename
         except:
             print("El intento de descargar con drive no funcionó")
@@ -41,7 +40,7 @@ def model_downloader(url, zip_path, dest_path):
             if file_id:
                 mega = Mega()
                 m = mega.login()
-                filename = m.download_url(url, dest_path=dest_folder)
+                filename = m.download_url(url, dest_path=dest_folder, dest_filename=f"{uuid.uuid4()}.zip")
 
                 return os.path.basename(filename)
             else:
@@ -55,7 +54,7 @@ def model_downloader(url, zip_path, dest_path):
     def download(url, dest_folder):
         try:
             print(f"Descargando desde url generica...")
-            dest_path = wget.download(url=url, out=dest_folder)
+            dest_path = wget.download(url=url, out=os.path.join(dest_folder, f"{uuid.uuid4()}.zip"))
 
             return os.path.basename(dest_path)
         except Exception as e:
