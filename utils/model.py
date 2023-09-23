@@ -6,6 +6,7 @@ import re
 import wget
 import sys
 import uuid
+import zipfile
 
 
 class InvalidDriveId(Exception):
@@ -80,8 +81,17 @@ def model_downloader(url, zip_path, dest_path):
         print(f"Descomprimiendo {filename}...")
         modelname = str(filename).replace(".zip", "")
         zip_file_path = os.path.join(zip_path, filename)
-            
-        shutil.unpack_archive(zip_file_path, os.path.join(dest_path, modelname))
+        
+        try:
+            shutil.unpack_archive(zip_file_path, os.path.join(dest_path, modelname))
+        except Exception as e:
+            try:
+                with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+                    zip_ref.extractall(dest_path)
+            except zipfile.BadZipFile as e:
+                print(f"Error: El archivo ZIP no es válido - {e}")
+            except Exception as e:
+                print(f"Error inesperado: {e}")
         
         if os.path.exists(zip_file_path):
             os.remove(zip_file_path)
