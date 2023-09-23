@@ -104,7 +104,7 @@ def get_model(weight_path, modelname):
     for root, dirs, files in os.walk(os.path.join(weight_path, modelname)):
         for file in files:
             if file.endswith('.index'):
-                resources['index'] =  os.path.relpath(os.path.join(root, file), start=weight_path)
+                resources['index'] =  os.path.relpath(os.path.join(root, file))
             if file.endswith('.pth'):
                 resources['pth'] =  os.path.relpath(os.path.join(root, file), start=weight_path)
     return resources
