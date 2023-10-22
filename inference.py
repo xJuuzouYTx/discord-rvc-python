@@ -216,8 +216,6 @@ class Inference:
             self.crepe_hop_length,
         )
         
-        delete_files([os.path.join(current_dir, 'weights') , modelname])
-        
         if "Success." in conversion_data[0]:
             wavfile.write(
                 "%s/%s" % ("audio-outputs",os.path.basename(self._output_file_name)),

@@ -9,6 +9,7 @@
 # Instalación de dependencias 🖥️
 Usando pip (python3.9.8 es recomendado)
 ```bash
+python -m venv env
 pip install -r requirements.txt
 ```
 
