@@ -50,7 +50,7 @@ class AudioQueue:
         # Check if has license
         user = True
 
-        if user:
+        if not user:
             embed = discord.Embed(
                 title=f"¡Lo sentimos!",
                 description=f"No tienes una suscripción activa, por favor visita https://rvcplayer.ai para obtener una suscripción",
