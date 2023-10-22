@@ -7,24 +7,12 @@ from myutils import Audio
 import uuid
 import typing
 from discord import app_commands
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
-import json
 from myutils import delete_files
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 bot = Bot(command_prefix=".", intents=discord.Intents.default())
-
-f = open('firebase_secrets.json')
-firebase_config = json.load(f)
-
-firebase_credentials = credentials.Certificate('firebase_secrets.json')
-firebase_app = firebase_admin.initialize_app(firebase_credentials)
-db = firestore.client()
-users_ref = db.collection("users")
 
 models = {}
 for root, _, files in os.walk("./weights"):
@@ -59,11 +47,10 @@ class AudioQueue:
         self.processing = False
 
     async def push(self, interaction: discord.Interaction, audiofile: discord.Attachment, voice: str, method: str):
+        # Check if has license
+        user = True
 
-        users = users_ref.where(
-            "discord_id", "==", str(interaction.user.id)).get()
-
-        if len(users) == 0:
+        if user:
             embed = discord.Embed(
                 title=f"¡Lo sentimos!",
                 description=f"No tienes una suscripción activa, por favor visita https://rvcplayer.ai para obtener una suscripción",

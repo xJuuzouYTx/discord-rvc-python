@@ -6,6 +6,7 @@ import random
 import shutil
 import torchaudio
 from pydub import AudioSegment
+import tempfile
 
 class Audio:
 
@@ -41,35 +42,31 @@ class Audio:
     def load_audio(cls, file, sr):
         try:
             file = file.strip(' "\n')  # Eliminar espacios y comillas del nombre del archivo
-
+            # Convertir a formato WAV si no lo está
             if not file.endswith(".wav"):
                 file_formanted = f"{file}.wav"
                 if not os.path.isfile(file_formanted):
-                    # Usar torchaudio para convertir a WAV (esto aprovecha la GPU si es compatible)
-                    sound = AudioSegment.from_mp3(file)
-                    sound = sound.set_frame_rate(sr)
-                    sound.export(file_formanted, format="wav", codec="pcm_f32le")
+                    (
+                        ffmpeg.input(file)
+                        .output(file_formanted, format="wav")
+                        .run(cmd=["ffmpeg", "-nostdin"], capture_stdout=True, capture_stderr=True)
+                    )
+            else:
+                file_formanted = file
 
-            numerator = round(random.uniform(1, 4), 4)
-            output_file = f"{file_formanted}FORMANTED_{numerator}.wav"
+            # Cargar el archivo formateado y devolverlo como NumPy array
+            out, _ = (
+                ffmpeg.input(file_formanted)
+                .output("-", format="f32le", acodec="pcm_f32le", ac=1, ar=sr)
+                .run(cmd=["ffmpeg", "-nostdin"], capture_stdout=True, capture_stderr=True)
+            )
 
-            # Usar torchaudio para aplicar el procesamiento de audio (esto aprovecha la GPU si es compatible)
-            waveform, sr = torchaudio.load(file_formanted)
-            torchaudio.save(output_file, waveform, sr)
-
-            print(f" _ Formanted {file_formanted}!\n")
-
-            out, _ = ffmpeg.input(output_file).output(
-                "-", format="f32le", acodec="pcm_f32le", ac=1, ar=sr
-            ).run(cmd=["ffmpeg", "-nostdin"], capture_stdout=True, capture_stderr=True)
-
-            os.remove(output_file)
-
+            # Eliminar el archivo formateado
+            os.remove(file_formanted)    
         except Exception as e:
             raise RuntimeError(f"Failed to load audio: {e}")
 
         return np.frombuffer(out, np.float32).flatten()
-
 
     @classmethod
     def dowload_from_url(self, url = None, output = "./audios/file.wav"):
