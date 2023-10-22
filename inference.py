@@ -49,6 +49,10 @@ class Inference:
         if not os.path.exists("./hubert_base.pt"):
             wget.download(
                 "https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/hubert_base.pt", out="./hubert_base.pt")
+        if not os.path.exists("./rmvpe.pt"):
+            wget.download(
+                "https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/rmvpe.pt", out="./rmvpe.pt"
+            )
     
     @property
     def id(self):
@@ -196,7 +200,6 @@ class Inference:
         index = model_info.get('index', '')
         pth = model_info.get('pth', None)
         
-        print("RVC: Empezando la inferencia...")
         infer_web.get_vc(pth)
         
         conversion_data = infer_web.vc_single(
