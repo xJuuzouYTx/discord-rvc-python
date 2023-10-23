@@ -53,7 +53,7 @@ class AudioQueue:
         if not user:
             embed = discord.Embed(
                 title=f"¡Lo sentimos!",
-                description=f"No tienes una suscripción activa, por favor visita https://rvcplayer.ai para obtener una suscripción",
+                description=f"No tienes una suscripción activa, por favor visita https://voni.vercel.app para obtener una suscripción",
                 color=discord.Color.brand_red()
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)

@@ -3,6 +3,7 @@ __pycache__
 /TEMP
 /audios/
 /audio-outputs/
+/zips/
 /LOGS
 /RUNTIME
 *.pyd
@@ -10,6 +11,7 @@ hubert_base.pt
 /logs
 /env
 .venv
+.vscode
 alexforkINSTALL.bat
 Changelog_CN.md
 Changelog_EN.md

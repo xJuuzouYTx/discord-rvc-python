@@ -22,7 +22,7 @@ def model_downloader(url, zip_path, dest_path):
         print(f"Descargando desde drive...")
         try:
             filename = gdown.download(url, os.path.join(dest_folder, f"{uuid.uuid4()}.zip"), fuzzy=True)
-            return filename
+            return os.path.basename(filename)
         except:
             print("El intento de descargar con drive no funcionó")
             return None
@@ -76,6 +76,8 @@ def model_downloader(url, zip_path, dest_path):
         sys.exit()
     else:
         filename = download(url, zip_path)
+        
+    print(filename)
 
     if filename:
         print(f"Descomprimiendo {filename}...")
@@ -124,3 +126,8 @@ def get_audios(audios_path):
     files = os.listdir(audios_path)
     # Filtrar solo los directorios
     return [file for file in files if not os.path.isdir(os.path.join(audios_path, file)) and os.path.join(audios_path, file).endswith(('.mp3', '.wav'))]
+
+
+if __name__ == '__main__':
+    model = model_downloader("https://drive.google.com/file/d/1rKnkc40BnqmjQk_cRNEpGpqRM4jdElRA/view", "./zips/", "./weights/")
+    print(model)
