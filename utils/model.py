@@ -76,8 +76,6 @@ def model_downloader(url, zip_path, dest_path):
         sys.exit()
     else:
         filename = download(url, zip_path)
-        
-    print(filename)
 
     if filename:
         print(f"Descomprimiendo {filename}...")
