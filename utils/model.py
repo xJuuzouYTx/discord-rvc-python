@@ -114,7 +114,7 @@ def get_model(weight_path, modelname):
         for file in files:
             if file.endswith('.index'):
                 resources['index'] =  os.path.relpath(os.path.join(root, file))
-            if file.endswith('.pth'):
+            if file.endswith('.pth') and not 'G_' in file and not 'D_':
                 resources['pth'] =  os.path.relpath(os.path.join(root, file), start=weight_path)
     return resources
 
