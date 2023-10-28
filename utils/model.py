@@ -73,7 +73,7 @@ def model_downloader(url, zip_path, dest_path):
         filename = mega_download(url, zip_path)
     elif url and 'pixeldrain' in url:
         print("No se puede descargar de pixeldrain")
-        filename = None
+        return None
     else:
         filename = download(url, zip_path)
 
@@ -116,7 +116,7 @@ def get_model(weight_path, modelname):
         for file in files:
             if file.endswith('.index'):
                 resources['index'] =  os.path.relpath(os.path.join(root, file))
-            if file.endswith('.pth') and not 'G_' in file and not 'D_':
+            if file.endswith('.pth') and not 'G_' in file and not 'D_' in file:
                 resources['pth'] =  os.path.relpath(os.path.join(root, file), start=weight_path)
     return resources
 
