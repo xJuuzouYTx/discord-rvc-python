@@ -73,7 +73,7 @@ def model_downloader(url, zip_path, dest_path):
         filename = mega_download(url, zip_path)
     elif url and 'pixeldrain' in url:
         print("No se puede descargar de pixeldrain")
-        sys.exit()
+        filename = None
     else:
         filename = download(url, zip_path)
 
