@@ -78,13 +78,14 @@ def model_downloader(url, zip_path, dest_path):
         filename = download(url, zip_path)
 
     if filename:
-        print(f"Descomprimiendo {filename}...")
         modelname = str(filename).replace(".zip", "")
         zip_file_path = os.path.join(zip_path, filename)
         
         try:
+            print(f"Descomprimiendo {filename}...")
             shutil.unpack_archive(zip_file_path, os.path.join(dest_path, modelname))
         except Exception as e:
+            print(f"Error al descomprimir {filename}...")
             try:
                 with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
                     zip_ref.extractall(dest_path)
