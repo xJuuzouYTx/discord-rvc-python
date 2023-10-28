@@ -87,6 +87,7 @@ def model_downloader(url, zip_path, dest_path):
         except Exception as e:
             print(f"Error al descomprimir {filename}...")
             try:
+                print(f"Intentando descomprimir opción 2: {filename}...")
                 with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
                     zip_ref.extractall(dest_path)
             except zipfile.BadZipFile as e:
